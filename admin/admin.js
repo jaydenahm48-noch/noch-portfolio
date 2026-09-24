@@ -1,6 +1,4 @@
 // ── Admin Panel JavaScript ────────────────────────────────────────────────
-// Mengelola login, dashboard portfolio, dan pesan masuk
-
 const API_BASE = "/api";
 const TOKEN_KEY = "admin_token";
 
@@ -32,16 +30,13 @@ function showDashboard() { document.getElementById("loginScreen").style.display 
 
 // ── Event bindings ─────────────────────────────────────────────────────────
 function bindEvents() {
-    // Login form
     document.getElementById("loginForm").addEventListener("submit", handleLogin);
 
-    // Logout
     document.getElementById("logoutBtn").addEventListener("click", () => {
         clearToken();
         showLogin();
     });
 
-    // Sidebar nav
     document.querySelectorAll(".nav-item").forEach(item => {
         item.addEventListener("click", e => {
             e.preventDefault();
@@ -51,13 +46,11 @@ function bindEvents() {
         });
     });
 
-    // Modal tambah portfolio
     document.getElementById("btnOpenModal").addEventListener("click", openModal);
     document.getElementById("btnCloseModal").addEventListener("click", closeModal);
     document.getElementById("btnCancelModal").addEventListener("click", closeModal);
     document.getElementById("modalOverlay").addEventListener("click", e => { if (e.target === document.getElementById("modalOverlay")) closeModal(); });
 
-    // Tambah/hapus baris gambar detail
     document.getElementById("btnAddDetailImg").addEventListener("click", addDetailImgRow);
     document.getElementById("detailImagesContainer").addEventListener("click", e => {
         if (e.target.closest(".btn-remove-img")) {
@@ -71,10 +64,8 @@ function bindEvents() {
         }
     });
 
-    // Form submit portfolio
     document.getElementById("portfolioForm").addEventListener("submit", handleAddPortfolio);
 
-    // Modal hapus
     document.getElementById("btnCloseDelete").addEventListener("click", closeDeleteModal);
     document.getElementById("btnCancelDelete").addEventListener("click", closeDeleteModal);
     document.getElementById("deleteOverlay").addEventListener("click", e => { if (e.target === document.getElementById("deleteOverlay")) closeDeleteModal(); });
@@ -211,7 +202,6 @@ async function handleAddPortfolio(e) {
     const submitTxt = document.getElementById("submitText");
     const submitSpin = document.getElementById("submitSpinner");
 
-    // Kumpulkan semua URL gambar detail (maks 10)
     const gambar_detail = Array.from(
         document.querySelectorAll(".detail-img-input")
     ).map(i => i.value.trim()).filter(Boolean).slice(0, 10);
@@ -222,32 +212,31 @@ async function handleAddPortfolio(e) {
     submitSpin.style.display = "inline-block";
 
     try {
-        const res = await fetch(`${API_BASE}/portfolio.mjs`);
-        method: "POST",
+        const res = await fetch(`${API_BASE}/portfolio.mjs`, {
+            method: "POST",
             headers: {
-            "Content-Type": "application/json",
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${getToken()}`,
             },
-        body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori, gambar_detail }),
+            body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori, gambar_detail }),
         });
-    const data = await res.json();
+        const data = await res.json();
 
-    if (res.ok && data.success) {
-        closeModal();
-        showAlert("Portfolio berhasil ditambahkan!", "success");
-        loadPortfolio();
-    } else {
-        // Token expired → re-login
-        if (res.status === 401) { clearToken(); showLogin(); return; }
-        errorEl.textContent = data.error || "Gagal menyimpan portfolio.";
+        if (res.ok && data.success) {
+            closeModal();
+            showAlert("Portfolio berhasil ditambahkan!", "success");
+            loadPortfolio();
+        } else {
+            if (res.status === 401) { clearToken(); showLogin(); return; }
+            errorEl.textContent = data.error || "Gagal menyimpan portfolio.";
+        }
+    } catch (err) {
+        errorEl.textContent = "Tidak dapat terhubung ke server.";
+    } finally {
+        submitBtn.disabled = false;
+        submitTxt.textContent = "Simpan";
+        submitSpin.style.display = "none";
     }
-} catch (err) {
-    errorEl.textContent = "Tidak dapat terhubung ke server.";
-} finally {
-    submitBtn.disabled = false;
-    submitTxt.textContent = "Simpan";
-    submitSpin.style.display = "none";
-}
 }
 
 // ── Portfolio: hapus ───────────────────────────────────────────────────────
@@ -274,33 +263,33 @@ async function handleDeletePortfolio() {
     spinner.style.display = "inline-block";
 
     try {
-        const res = await fetch(`${API_BASE}/portfolio.mjs`);
-        method: "DELETE",
+        const res = await fetch(`${API_BASE}/portfolio.mjs`, {
+            method: "DELETE",
             headers: {
-            "Content-Type": "application/json",
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${getToken()}`,
             },
-        body: JSON.stringify({ rowIndex: deleteTarget.rowIndex }),
+            body: JSON.stringify({ rowIndex: deleteTarget.rowIndex }),
         });
-    const data = await res.json();
+        const data = await res.json();
 
-    if (res.ok && data.success) {
+        if (res.ok && data.success) {
+            closeDeleteModal();
+            showAlert("Portfolio berhasil dihapus.", "success");
+            loadPortfolio();
+        } else {
+            if (res.status === 401) { clearToken(); showLogin(); return; }
+            showAlert(data.error || "Gagal menghapus.", "error");
+            closeDeleteModal();
+        }
+    } catch (err) {
+        showAlert("Tidak dapat terhubung ke server.", "error");
         closeDeleteModal();
-        showAlert("Portfolio berhasil dihapus.", "success");
-        loadPortfolio();
-    } else {
-        if (res.status === 401) { clearToken(); showLogin(); return; }
-        showAlert(data.error || "Gagal menghapus.", "error");
-        closeDeleteModal();
+    } finally {
+        btn.disabled = false;
+        txt.textContent = "Hapus";
+        spinner.style.display = "none";
     }
-} catch (err) {
-    showAlert("Tidak dapat terhubung ke server.", "error");
-    closeDeleteModal();
-} finally {
-    btn.disabled = false;
-    txt.textContent = "Hapus";
-    spinner.style.display = "none";
-}
 }
 
 // ── Messages: load ─────────────────────────────────────────────────────────
@@ -310,9 +299,7 @@ async function loadMessages() {
 
     try {
         const token = getToken();
-        const SPREADSHEET_ID = ""; // kosong karena ini client-side, perlu endpoint terpisah
 
-        // Fetch pesan via endpoint portfolio yang sama tapi sheet berbeda
         const res = await fetch(`${API_BASE}/messages.mjs`, {
             headers: { "Authorization": `Bearer ${token}` },
         });
@@ -375,7 +362,7 @@ function addDetailImgRow() {
     const div = document.createElement("div");
     div.className = "detail-img-row";
     div.innerHTML = `
-        <input type="url" class="detail-img-input" placeholder="URL gambar ${rows.length + 1} (https://drive.google.com/...)">
+        <input type="url" class="detail-img-input" placeholder="URL gambar ${rows.length + 1}">
         <button type="button" class="btn-icon btn-remove-img" title="Hapus"><i class="fa fa-minus-circle"></i></button>`;
     container.appendChild(div);
 }
@@ -383,10 +370,9 @@ function addDetailImgRow() {
 function openModal() {
     document.getElementById("portfolioForm").reset();
     document.getElementById("formError").textContent = "";
-    // Reset gambar detail ke 1 baris kosong
     document.getElementById("detailImagesContainer").innerHTML = `
         <div class="detail-img-row">
-            <input type="url" class="detail-img-input" placeholder="URL gambar 1 (https://drive.google.com/...)">
+            <input type="url" class="detail-img-input" placeholder="URL gambar 1">
             <button type="button" class="btn-icon btn-remove-img" title="Hapus"><i class="fa fa-minus-circle"></i></button>
         </div>`;
     document.getElementById("modalOverlay").style.display = "flex";
