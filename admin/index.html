@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Noch Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <!-- ── LOGIN SCREEN ─────────────────────────────────────────────────────── -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo"><span>N</span>och</div>
+            <h2>Admin Panel</h2>
+            <p class="login-sub">Masuk untuk kelola portfolio</p>
+            <form id="loginForm">
+                <div class="input-group">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="loginUsername" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Password" required
+                        autocomplete="current-password">
+                </div>
+                <p id="loginError" class="error-msg"></p>
+                <button type="submit" id="loginBtn" class="btn btn-primary btn-full">
+                    <span id="loginBtnText">Login</span>
+                    <i id="loginSpinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── DASHBOARD ─────────────────────────────────────────────────────────── -->
+    <div id="dashboard" class="dashboard" style="display:none;">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo"><span>N</span>och</div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="portfolio">
+                    <i class="fa fa-briefcase"></i> Portfolio
+                </a>
+                <a href="#" class="nav-item" data-section="messages">
+                    <i class="fa fa-comments"></i> Pesan Masuk
+                </a>
+            </nav>
+            <button id="logoutBtn" class="btn btn-logout">
+                <i class="fa fa-sign-out-alt"></i> Logout
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Header -->
+            <header class="dash-header">
+                <h1 id="pageTitle">Portfolio</h1>
+                <div class="header-actions">
+                    <button id="btnOpenModal" class="btn btn-primary" style="display:none;">
+                        <i class="fa fa-plus"></i> Tambah Portfolio
+                    </button>
+                </div>
+            </header>
+
+            <!-- Alert -->
+            <div id="alertBox" class="alert" style="display:none;"></div>
+
+            <!-- ── SECTION: Portfolio ── -->
+            <section id="sectionPortfolio" class="section-content active">
+                <div id="portfolioGrid" class="portfolio-grid">
+                    <div class="loading-state">
+                        <i class="fa fa-spinner fa-spin"></i> Memuat data...
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── SECTION: Messages ── -->
+            <section id="sectionMessages" class="section-content">
+                <div id="messagesTable" class="table-wrapper">
+                    <div class="loading-state">
+                        <i class="fa fa-spinner fa-spin"></i> Memuat data...
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ── MODAL: Tambah Portfolio ───────────────────────────────────────────── -->
+    <div id="modalOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Tambah Portfolio</h3>
+                <button id="btnCloseModal" class="btn-icon"><i class="fa fa-times"></i></button>
+            </div>
+            <form id="portfolioForm" class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Judul <span class="required">*</span></label>
+                        <input type="text" id="pf-judul" placeholder="Nama project" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <input type="text" id="pf-kategori" placeholder="Web, Mobile, dll">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi <span class="required">*</span></label>
+                    <textarea id="pf-deskripsi" placeholder="Jelaskan project ini..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL Gambar (Google Drive) <span class="required">*</span></label>
+                    <input type="url" id="pf-gambar" placeholder="https://drive.google.com/..." required>
+                    <small>Gunakan link direct image dari Google Drive</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Link Project</label>
+                        <input type="url" id="pf-link" placeholder="https://github.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Teknologi</label>
+                        <input type="text" id="pf-teknologi" placeholder="React, Laravel, dll">
+                    </div>
+                </div>
+                <div id="formError" class="error-msg"></div>
+                <div class="modal-footer">
+                    <button type="button" id="btnCancelModal" class="btn btn-secondary">Batal</button>
+                    <button type="submit" id="btnSubmitPortfolio" class="btn btn-primary">
+                        <span id="submitText">Simpan</span>
+                        <i id="submitSpinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── MODAL: Konfirmasi Hapus ───────────────────────────────────────────── -->
+    <div id="deleteOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h3>Hapus Portfolio</h3>
+                <button id="btnCloseDelete" class="btn-icon"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Yakin ingin menghapus <strong id="deleteTargetName"></strong>?</p>
+                <p class="delete-warn">Tindakan ini tidak bisa dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelDelete" class="btn btn-secondary">Batal</button>
+                <button id="btnConfirmDelete" class="btn btn-danger">
+                    <span id="deleteText">Hapus</span>
+                    <i id="deleteSpinner" class="fa fa-spinner fa-spin" style="display:none;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
