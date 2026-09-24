@@ -477,8 +477,63 @@
         <!--Main Content end-->
     </div>
     <!--Main container end-->
+    <!-- ── Portfolio Detail Modal ──────────────────────────────────────────── -->
+    <div id="portfolioDetailOverlay"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999; overflow-y:auto; padding:20px;">
+        <div id="portfolioDetailCard"
+            style="max-width:860px; margin:40px auto; background:var(--bg-black-100); border-radius:12px; overflow:hidden; position:relative;">
+            <button onclick="closePortfolioDetail()"
+                style="position:absolute; top:14px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-black-900); z-index:10; line-height:1;">&#x2715;</button>
+            <!-- Thumbnail besar -->
+            <div id="pdThumbnail" style="width:100%; max-height:400px; overflow:hidden; background:var(--bg-black-50);">
+                <img id="pdThumbImg" src="" alt="" style="width:100%; height:400px; object-fit:cover; display:block;">
+            </div>
+            <!-- Info -->
+            <div style="padding:24px 28px;">
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px;">
+                    <h2 id="pdTitle" style="font-size:22px; font-weight:700; color:var(--text-black-900); flex:1;"></h2>
+                    <span id="pdKategori"
+                        style="background:rgba(236,24,57,0.12); color:var(--skin-color); font-size:12px; font-weight:600; padding:4px 14px; border-radius:20px;"></span>
+                </div>
+                <p id="pdDeskripsi"
+                    style="font-size:15px; color:var(--text-black-700); line-height:1.7; margin-bottom:16px;"></p>
+                <div id="pdTeknologi" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
+                <a id="pdLink" href="#" target="_blank" rel="noopener"
+                    style="display:none; background:var(--skin-color); color:#fff; padding:10px 28px; border-radius:40px; font-size:14px; font-weight:500; transition:opacity 0.2s;">
+                    <i class="fa fa-external-link-alt"></i> Lihat Project
+                </a>
+            </div>
+            <!-- Galeri detail -->
+            <div id="pdGallerySection" style="display:none; padding:0 28px 28px;">
+                <h4
+                    style="font-size:16px; font-weight:700; color:var(--text-black-900); margin-bottom:14px; padding-top:4px; border-top:1px solid var(--bg-black-50); padding-top:20px;">
+                    <i class="fa fa-images" style="color:var(--skin-color); margin-right:8px;"></i>Dokumentasi
+                </h4>
+                <div id="pdGalleryGrid"
+                    style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Lightbox gambar detail ────────────────────────────────────────────── -->
+    <div id="lightboxOverlay"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; align-items:center; justify-content:center;">
+        <button onclick="closeLightbox()"
+            style="position:absolute; top:16px; right:20px; background:none; border:none; color:#fff; font-size:28px; cursor:pointer; line-height:1;">&#x2715;</button>
+        <button onclick="lightboxPrev()"
+            style="position:absolute; left:16px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:24px; cursor:pointer; padding:12px 16px; border-radius:8px;">&#8592;</button>
+        <img id="lightboxImg" src="" alt=""
+            style="max-width:90vw; max-height:88vh; object-fit:contain; border-radius:6px;">
+        <button onclick="lightboxNext()"
+            style="position:absolute; right:16px; background:rgba(255,255,255,0.15); border:none; color:#fff; font-size:24px; cursor:pointer; padding:12px 16px; border-radius:8px;">&#8594;</button>
+        <div id="lightboxCounter"
+            style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.7); font-size:13px; font-family:Poppins,sans-serif;">
+        </div>
+    </div>
+
     <!--Style Switch start-->
     <div class="style-switcher">
+
         <div class="style-switcher-toggler s-icon">
             <i class="fas fa-cog fa-spin"></i>
         </div>
@@ -501,7 +556,7 @@
     <script src="js/script.js"></script>
     <script src="js/style-switcher.js"></script>
 
-    <!--Contact Form Handler-->
+    <!--Portfolio Detail & Gallery Handler-->
     <script>
         // ── Portfolio Loader ─────────────────────────────────────────────────
         async function loadPortfolio() {
@@ -520,19 +575,18 @@
                 }
 
                 row.innerHTML = items.map(item => {
-                    const linkAttr = item.link ? `href="${item.link}" target="_blank" rel="noopener"` : `href="#" onclick="return false"`;
                     const imgSrc = item.gambar || "images/port.jpg";
                     const title = item.judul || "";
-                    const tech = item.teknologi ? `<p style="font-size:12px;color:var(--text-black-700);margin-top:8px;padding:0 10px 10px;">${item.teknologi}</p>` : "";
+                    const tech = item.teknologi ? `<p style="font-size:11px;color:var(--text-black-700);margin:4px 10px 8px;line-height:1.4;">${item.teknologi}</p>` : "";
+                    const dataAttr = encodeURIComponent(JSON.stringify(item));
                     return `
                         <div class="portfolio-item padd-15">
-                            <div class="portfolio-item-inner shadow-dark">
+                            <div class="portfolio-item-inner shadow-dark" style="cursor:pointer;" onclick="openPortfolioDetail('${dataAttr}')">
                                 <div class="portfolio-img">
-                                    <img src="${imgSrc}" alt="${title}" onerror="this.src='images/port.jpg'">
+                                    <img src="${imgSrc}" alt="${title}" onerror="this.src='images/port.jpg'" style="transition:transform 0.3s ease;">
                                 </div>
                                 ${title ? `<h4 style="padding:10px 10px 4px;font-size:14px;color:var(--text-black-900);font-weight:600;">${title}</h4>` : ""}
                                 ${tech}
-                                ${item.link ? `<div style="padding:0 10px 12px;"><a ${linkAttr} style="font-size:12px;color:var(--skin-color);font-weight:500;"><i class="fa fa-external-link-alt"></i> Lihat Project</a></div>` : ""}
                             </div>
                         </div>`;
                 }).join("");
@@ -542,6 +596,100 @@
         }
 
         loadPortfolio();
+
+        // ── Portfolio Detail Modal ───────────────────────────────────────────
+        function openPortfolioDetail(encoded) {
+            const item = JSON.parse(decodeURIComponent(encoded));
+
+            document.getElementById("pdThumbImg").src = item.gambar || "images/port.jpg";
+            document.getElementById("pdTitle").textContent = item.judul || "";
+            document.getElementById("pdDeskripsi").textContent = item.deskripsi || "";
+
+            const kat = document.getElementById("pdKategori");
+            kat.textContent = item.kategori || "";
+            kat.style.display = item.kategori ? "inline-block" : "none";
+
+            const techEl = document.getElementById("pdTeknologi");
+            techEl.innerHTML = item.teknologi
+                ? item.teknologi.split(",").map(t => `<span style="background:var(--bg-black-50);color:var(--text-black-700);font-size:12px;padding:3px 12px;border-radius:20px;">${t.trim()}</span>`).join("")
+                : "";
+
+            const linkEl = document.getElementById("pdLink");
+            if (item.link) { linkEl.href = item.link; linkEl.style.display = "inline-block"; }
+            else { linkEl.style.display = "none"; }
+
+            const gallerySection = document.getElementById("pdGallerySection");
+            const galleryGrid = document.getElementById("pdGalleryGrid");
+            const detailImgs = item.gambar_detail
+                ? item.gambar_detail.split("|").map(s => s.trim()).filter(Boolean)
+                : [];
+
+            if (detailImgs.length > 0) {
+                window._lightboxImgs = detailImgs;
+                galleryGrid.innerHTML = detailImgs.map((url, i) => `
+                    <div style="aspect-ratio:16/10;overflow:hidden;border-radius:8px;cursor:pointer;background:var(--bg-black-50);" onclick="openLightbox(${i})">
+                        <img src="${url}" alt="Detail ${i + 1}" loading="lazy"
+                            style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease;"
+                            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"
+                            onerror="this.parentElement.style.display='none'">
+                    </div>`).join("");
+                gallerySection.style.display = "block";
+            } else {
+                gallerySection.style.display = "none";
+                window._lightboxImgs = [];
+            }
+
+            document.getElementById("portfolioDetailOverlay").style.display = "block";
+            document.body.style.overflow = "hidden";
+        }
+
+        function closePortfolioDetail() {
+            document.getElementById("portfolioDetailOverlay").style.display = "none";
+            document.body.style.overflow = "";
+        }
+
+        document.getElementById("portfolioDetailOverlay").addEventListener("click", function (e) {
+            if (e.target === this) closePortfolioDetail();
+        });
+
+        // ── Lightbox ─────────────────────────────────────────────────────────
+        let _lbIndex = 0;
+
+        function openLightbox(index) {
+            _lbIndex = index;
+            updateLightbox();
+            document.getElementById("lightboxOverlay").style.display = "flex";
+        }
+
+        function closeLightbox() {
+            document.getElementById("lightboxOverlay").style.display = "none";
+        }
+
+        function lightboxPrev() {
+            _lbIndex = (_lbIndex - 1 + (window._lightboxImgs || []).length) % (window._lightboxImgs || [1]).length;
+            updateLightbox();
+        }
+
+        function lightboxNext() {
+            _lbIndex = (_lbIndex + 1) % (window._lightboxImgs || [1]).length;
+            updateLightbox();
+        }
+
+        function updateLightbox() {
+            const imgs = window._lightboxImgs || [];
+            document.getElementById("lightboxImg").src = imgs[_lbIndex] || "";
+            document.getElementById("lightboxCounter").textContent = `${_lbIndex + 1} / ${imgs.length}`;
+        }
+
+        document.addEventListener("keydown", function (e) {
+            if (document.getElementById("lightboxOverlay").style.display === "flex") {
+                if (e.key === "ArrowLeft") lightboxPrev();
+                if (e.key === "ArrowRight") lightboxNext();
+                if (e.key === "Escape") closeLightbox();
+            } else if (document.getElementById("portfolioDetailOverlay").style.display === "block") {
+                if (e.key === "Escape") closePortfolioDetail();
+            }
+        });
     </script>
     <script>
         document.getElementById("contactForm").addEventListener("submit", async function (e) {

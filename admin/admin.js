@@ -57,6 +57,20 @@ function bindEvents() {
     document.getElementById("btnCancelModal").addEventListener("click", closeModal);
     document.getElementById("modalOverlay").addEventListener("click", e => { if (e.target === document.getElementById("modalOverlay")) closeModal(); });
 
+    // Tambah/hapus baris gambar detail
+    document.getElementById("btnAddDetailImg").addEventListener("click", addDetailImgRow);
+    document.getElementById("detailImagesContainer").addEventListener("click", e => {
+        if (e.target.closest(".btn-remove-img")) {
+            const row = e.target.closest(".detail-img-row");
+            const container = document.getElementById("detailImagesContainer");
+            if (container.querySelectorAll(".detail-img-row").length > 1) {
+                row.remove();
+            } else {
+                row.querySelector(".detail-img-input").value = "";
+            }
+        }
+    });
+
     // Form submit portfolio
     document.getElementById("portfolioForm").addEventListener("submit", handleAddPortfolio);
 
@@ -197,6 +211,11 @@ async function handleAddPortfolio(e) {
     const submitTxt = document.getElementById("submitText");
     const submitSpin = document.getElementById("submitSpinner");
 
+    // Kumpulkan semua URL gambar detail (maks 10)
+    const gambar_detail = Array.from(
+        document.querySelectorAll(".detail-img-input")
+    ).map(i => i.value.trim()).filter(Boolean).slice(0, 10);
+
     errorEl.textContent = "";
     submitBtn.disabled = true;
     submitTxt.textContent = "Menyimpan...";
@@ -209,7 +228,7 @@ async function handleAddPortfolio(e) {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${getToken()}`,
             },
-            body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori }),
+            body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori, gambar_detail }),
         });
         const data = await res.json();
 
@@ -346,9 +365,30 @@ function renderMessagesTable(messages) {
 }
 
 // ── Modal helpers ──────────────────────────────────────────────────────────
+function addDetailImgRow() {
+    const container = document.getElementById("detailImagesContainer");
+    const rows = container.querySelectorAll(".detail-img-row");
+    if (rows.length >= 10) {
+        showAlert("Maksimal 10 gambar detail.", "error");
+        return;
+    }
+    const div = document.createElement("div");
+    div.className = "detail-img-row";
+    div.innerHTML = `
+        <input type="url" class="detail-img-input" placeholder="URL gambar ${rows.length + 1} (https://drive.google.com/...)">
+        <button type="button" class="btn-icon btn-remove-img" title="Hapus"><i class="fa fa-minus-circle"></i></button>`;
+    container.appendChild(div);
+}
+
 function openModal() {
     document.getElementById("portfolioForm").reset();
     document.getElementById("formError").textContent = "";
+    // Reset gambar detail ke 1 baris kosong
+    document.getElementById("detailImagesContainer").innerHTML = `
+        <div class="detail-img-row">
+            <input type="url" class="detail-img-input" placeholder="URL gambar 1 (https://drive.google.com/...)">
+            <button type="button" class="btn-icon btn-remove-img" title="Hapus"><i class="fa fa-minus-circle"></i></button>
+        </div>`;
     document.getElementById("modalOverlay").style.display = "flex";
 }
 

@@ -710,3 +710,60 @@ table .td-message {
         grid-template-columns: 1fr;
     }
 }
+
+/* ── Gambar Detail Input Rows ──────────────────────────────────────────────── */
+.detail-img-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.detail-img-row .detail-img-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--bg-50);
+    border-radius: 8px;
+    background: var(--bg-900);
+    color: var(--text-900);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    transition: var(--transition);
+}
+
+.detail-img-row .detail-img-input:focus {
+    border-color: var(--skin-color);
+    box-shadow: 0 0 0 3px rgba(236, 24, 57, 0.12);
+}
+
+.btn-remove-img {
+    color: #e74c3c;
+    font-size: 16px;
+    flex-shrink: 0;
+    padding: 4px 6px;
+}
+
+.btn-remove-img:hover {
+    opacity: 0.75;
+}
+
+.btn-add-img {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px dashed var(--skin-color);
+    color: var(--skin-color);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: var(--transition);
+}
+
+.btn-add-img:hover {
+    background: rgba(236, 24, 57, 0.06);
+}

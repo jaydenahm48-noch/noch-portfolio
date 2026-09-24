@@ -117,9 +117,24 @@
                     <textarea id="pf-deskripsi" placeholder="Jelaskan project ini..." required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>URL Gambar (Google Drive) <span class="required">*</span></label>
+                    <label>URL Thumbnail <span class="required">*</span></label>
                     <input type="url" id="pf-gambar" placeholder="https://drive.google.com/..." required>
-                    <small>Gunakan link direct image dari Google Drive</small>
+                    <small>Gambar utama yang tampil di grid portfolio</small>
+                </div>
+                <div class="form-group">
+                    <label>Gambar Detail <small style="font-weight:400;">(5–10 gambar dokumentasi)</small></label>
+                    <div id="detailImagesContainer">
+                        <div class="detail-img-row">
+                            <input type="url" class="detail-img-input"
+                                placeholder="URL gambar 1 (https://drive.google.com/...)">
+                            <button type="button" class="btn-icon btn-remove-img" title="Hapus"><i
+                                    class="fa fa-minus-circle"></i></button>
+                        </div>
+                    </div>
+                    <button type="button" id="btnAddDetailImg" class="btn-add-img">
+                        <i class="fa fa-plus"></i> Tambah URL Gambar
+                    </button>
+                    <small>Maksimal 10 gambar. Gambar ini tampil di halaman detail portfolio.</small>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
