@@ -144,7 +144,7 @@ async function loadPortfolio() {
     grid.innerHTML = `<div class="loading-state"><i class="fa fa-spinner fa-spin"></i><br>Memuat data...</div>`;
 
     try {
-        const res = await fetch(`${API_BASE}/portfolio`);
+        const res = await fetch(`${API_BASE}/portfolio.mjs`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.error);
@@ -222,32 +222,32 @@ async function handleAddPortfolio(e) {
     submitSpin.style.display = "inline-block";
 
     try {
-        const res = await fetch(`${API_BASE}/portfolio`, {
-            method: "POST",
+        const res = await fetch(`${API_BASE}/portfolio.mjs`);
+        method: "POST",
             headers: {
-                "Content-Type": "application/json",
+            "Content-Type": "application/json",
                 "Authorization": `Bearer ${getToken()}`,
             },
-            body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori, gambar_detail }),
+        body: JSON.stringify({ judul, deskripsi, gambar, link, teknologi, kategori, gambar_detail }),
         });
-        const data = await res.json();
+    const data = await res.json();
 
-        if (res.ok && data.success) {
-            closeModal();
-            showAlert("Portfolio berhasil ditambahkan!", "success");
-            loadPortfolio();
-        } else {
-            // Token expired → re-login
-            if (res.status === 401) { clearToken(); showLogin(); return; }
-            errorEl.textContent = data.error || "Gagal menyimpan portfolio.";
-        }
-    } catch (err) {
-        errorEl.textContent = "Tidak dapat terhubung ke server.";
-    } finally {
-        submitBtn.disabled = false;
-        submitTxt.textContent = "Simpan";
-        submitSpin.style.display = "none";
+    if (res.ok && data.success) {
+        closeModal();
+        showAlert("Portfolio berhasil ditambahkan!", "success");
+        loadPortfolio();
+    } else {
+        // Token expired → re-login
+        if (res.status === 401) { clearToken(); showLogin(); return; }
+        errorEl.textContent = data.error || "Gagal menyimpan portfolio.";
     }
+} catch (err) {
+    errorEl.textContent = "Tidak dapat terhubung ke server.";
+} finally {
+    submitBtn.disabled = false;
+    submitTxt.textContent = "Simpan";
+    submitSpin.style.display = "none";
+}
 }
 
 // ── Portfolio: hapus ───────────────────────────────────────────────────────
@@ -274,33 +274,33 @@ async function handleDeletePortfolio() {
     spinner.style.display = "inline-block";
 
     try {
-        const res = await fetch(`${API_BASE}/portfolio`, {
-            method: "DELETE",
+        const res = await fetch(`${API_BASE}/portfolio.mjs`);
+        method: "DELETE",
             headers: {
-                "Content-Type": "application/json",
+            "Content-Type": "application/json",
                 "Authorization": `Bearer ${getToken()}`,
             },
-            body: JSON.stringify({ rowIndex: deleteTarget.rowIndex }),
+        body: JSON.stringify({ rowIndex: deleteTarget.rowIndex }),
         });
-        const data = await res.json();
+    const data = await res.json();
 
-        if (res.ok && data.success) {
-            closeDeleteModal();
-            showAlert("Portfolio berhasil dihapus.", "success");
-            loadPortfolio();
-        } else {
-            if (res.status === 401) { clearToken(); showLogin(); return; }
-            showAlert(data.error || "Gagal menghapus.", "error");
-            closeDeleteModal();
-        }
-    } catch (err) {
-        showAlert("Tidak dapat terhubung ke server.", "error");
+    if (res.ok && data.success) {
         closeDeleteModal();
-    } finally {
-        btn.disabled = false;
-        txt.textContent = "Hapus";
-        spinner.style.display = "none";
+        showAlert("Portfolio berhasil dihapus.", "success");
+        loadPortfolio();
+    } else {
+        if (res.status === 401) { clearToken(); showLogin(); return; }
+        showAlert(data.error || "Gagal menghapus.", "error");
+        closeDeleteModal();
     }
+} catch (err) {
+    showAlert("Tidak dapat terhubung ke server.", "error");
+    closeDeleteModal();
+} finally {
+    btn.disabled = false;
+    txt.textContent = "Hapus";
+    spinner.style.display = "none";
+}
 }
 
 // ── Messages: load ─────────────────────────────────────────────────────────
@@ -313,7 +313,7 @@ async function loadMessages() {
         const SPREADSHEET_ID = ""; // kosong karena ini client-side, perlu endpoint terpisah
 
         // Fetch pesan via endpoint portfolio yang sama tapi sheet berbeda
-        const res = await fetch(`${API_BASE}/messages`, {
+        const res = await fetch(`${API_BASE}/messages.mjs`, {
             headers: { "Authorization": `Bearer ${token}` },
         });
 
