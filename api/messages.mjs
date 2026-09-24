@@ -1,7 +1,7 @@
 // Vercel Serverless Function — Messages Reader (Admin only)
 // GET /api/messages → ambil semua pesan dari Sheet1 (butuh auth token)
 
-import { verifyJWT } from "./auth.js";
+import { verifyJWT } from "./auth.mjs";
 
 const SECRET = process.env.JWT_SECRET || "changeme_set_in_vercel_env";
 const SHEET_NAME = "Sheet1";
